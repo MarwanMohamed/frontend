@@ -18,7 +18,7 @@
 
         <div v-if="respon">
             <div class="respon" v-for="index in respon.max.length">
-                {{respon.name}} - {{respon.date[index-1]}} <br>
+                {{respon.name}}  <br>
                 Max Temperature : {{respon.max[index-1]}} <br>
                 Min Temperature : {{respon.min[index-1]}} <br>
 
