@@ -8,19 +8,21 @@
         <div class="form-group">
             <select class="form-control" name="city" v-model="cityModel">
                 <option value="" disabled selected>Select City</option>
-                <option v-for="city in cities" :value="city.id" :key="city.id">{{city.name}}</option>
+                <option v-for="city in cities" :value="city.name" :key="city.name">{{city.name}}</option>
             </select>
+            <div class="has-error"><span class="help-block" v-if="cityError"><strong>City is required.</strong></span></div>
         </div>
 
         <div class="form-group">
             <input type="text" name="date" class="form-control" v-model="date"  placeholder="14-06-2018">
+            <div class="has-error"><span class="help-block" v-if="dateError"><strong>Date is required.</strong></span></div>
         </div>
 
         <div v-if="respon">
             <div class="respon" v-for="index in respon.max.length">
                 {{respon.name}}  <br>
-                Max Temperature : {{respon.max[index-1]}} <br>
-                Min Temperature : {{respon.min[index-1]}} <br>
+                Max Temperature : {{respon.max[index-1].toFixed(2)}} <br>
+                Min Temperature : {{respon.min[index-1].toFixed(2)}} <br>
 
                 <img :src="getImgUrl(index-1)" >
                 <hr>
@@ -44,7 +46,9 @@ export default {
             cities: [],
             cityModel: '',
             date: '',
-            respon: ''
+            respon: '',
+            cityError: false,
+            dateError: false,
         }
     }, 
     methods: {
@@ -60,10 +64,18 @@ export default {
                 })
         },
         getTemprature() {
-            this.$http.get('http://localhost:8000/api/getTemprature/'+ this.cityModel + '/'+ this.date)
-                .then(function(respon){
-                    this.respon = JSON.parse(respon.bodyText);
-                })
+            if (!this.cityModel) {
+                this.cityError = true;
+
+            } else if(!this.date.replace(/\s/g, '').length){
+                this.dateError = true;
+            }else {
+                this.dateError = false;
+                this.$http.get('http://localhost:8000/api/getTemprature/'+ this.cityModel + '/'+ this.date)
+                    .then(function(respon){
+                        this.respon = JSON.parse(respon.bodyText);
+                    })
+            }
         }
 
     },
@@ -88,18 +100,7 @@ h1, h2 {
 }
 
 .form-control {
-    width: 100%;
     margin-bottom: 10px;
-    padding: 0.5rem 0.75rem;
-    font-size: 1rem;
-    line-height: 1.25;
-    color: #464a4c;
-    background-color: #fff;
-    background-image: none;
-    -webkit-background-clip: padding-box;
-    background-clip: padding-box;
-    border: 1px solid rgba(0, 0, 0, 0.15);
-    border-radius: 0.25rem;
 }
 
 .form-group {
